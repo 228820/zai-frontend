@@ -104,7 +104,14 @@ export default {
     },
     mounted() {
         if (this.loggedIn) {
-            this.$router.push('/profile')
+            if (
+                this.loggedIn['roles'] &&
+                this.loggedIn['roles'].includes('ADMIN')
+            ) {
+                this.$router.push('/admin')
+            } else {
+                this.$router.push('/user')
+            }
         }
     },
     methods: {
