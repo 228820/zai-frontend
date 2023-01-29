@@ -61,14 +61,17 @@ export default {
             return user?.id
         },
         isUserAdmin() {
-            if (this.currentUser && this.currentUser['roles']) {
-                return this.currentUser['roles'].includes('ADMIN')
+            if (this.currentUser) {
+                return JSON.parse(localStorage.getItem('user')).role == 'ADMIN'
             }
             return false
         },
         isUser() {
-            if (this.currentUser && this.currentUser['roles']) {
-                return !this.currentUser['roles'].includes('ADMIN')
+            if (this.currentUser) {
+                return (
+                    JSON.parse(localStorage.getItem('user')).role != 'ADMIN' &&
+                    JSON.parse(localStorage.getItem('user')).role == 'USER'
+                )
             }
             return false
         },

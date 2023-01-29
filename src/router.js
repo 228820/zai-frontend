@@ -4,6 +4,7 @@ import LoginComponent from './components/LoginComponent.vue'
 import RegisterComponent from './components/RegisterComponent.vue'
 import UserComponent from './components/UserComponent.vue'
 import AdminComponent from './components/AdminComponent.vue'
+import UsersListComponent from './components/UsersListComponent.vue'
 
 const routes = [
     {
@@ -24,12 +25,16 @@ const routes = [
         component: RegisterComponent,
     },
     {
-        path: '/user',
+        path: '/userMessage',
         component: UserComponent,
     },
     {
-        path: '/admin',
+        path: '/adminMessage',
         component: AdminComponent,
+    },
+    {
+        path: '/users',
+        component: UsersListComponent,
     },
 ]
 

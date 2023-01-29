@@ -104,13 +104,10 @@ export default {
     },
     mounted() {
         if (this.loggedIn) {
-            if (
-                this.loggedIn['roles'] &&
-                this.loggedIn['roles'].includes('ADMIN')
-            ) {
-                this.$router.push('/admin')
+            if (JSON.parse(localStorage.getItem('user')).role == 'ADMIN') {
+                this.$router.push('/adminMessage')
             } else {
-                this.$router.push('/user')
+                this.$router.push('/userMessage')
             }
         }
     },

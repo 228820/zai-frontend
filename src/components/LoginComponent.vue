@@ -77,10 +77,10 @@ export default {
     },
     created() {
         if (this.loggedIn) {
-            if (this.loggedIn.role == 'ADMIN') {
-                this.$router.push('/admin')
+            if (localStorage.getItem('user').role == 'ADMIN') {
+                this.$router.push('/adminMessage')
             } else {
-                this.$router.push('/user')
+                this.$router.push('/userMessage')
             }
         }
     },
@@ -98,12 +98,13 @@ export default {
                 if (response.data.accessToken) {
                     this.loading = false
                     localStorage.setItem('user', JSON.stringify(response.data))
+                    console.log(response)
                     if (response.data.role == 'ADMIN') {
-                        this.$router.go(0)
-                        this.$router.push('/admin')
+                        this.$router.push('/adminMessage')
+                        this.$router.go(-1)
                     } else {
-                        this.$router.go(0)
-                        this.$router.push('/user')
+                        this.$router.push('/userMessage')
+                        this.$router.go(-1)
                     }
                 }
             } catch (e) {
