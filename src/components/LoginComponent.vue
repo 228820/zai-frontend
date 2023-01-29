@@ -72,17 +72,16 @@ export default {
     computed: {
         loggedIn() {
             const user = JSON.parse(localStorage.getItem('user'))
-            return user
+            return !!user?.id
         },
     },
     created() {
-        if (
-            this.loggedIn['roles'] &&
-            this.loggedIn['roles'].includes('ADMIN')
-        ) {
-            this.$router.push('/admin')
-        } else {
-            this.$router.push('/user')
+        if (this.loggedIn) {
+            if (this.loggedIn.role == 'ADMIN') {
+                this.$router.push('/admin')
+            } else {
+                this.$router.push('/user')
+            }
         }
     },
     methods: {
@@ -90,13 +89,26 @@ export default {
             const API_URL = 'http://localhost:8080/api/auth/'
             this.loading = true
 
-            const response = await axios.post(API_URL + 'signin', {
-                username: user.username,
-                password: user.password,
-            })
+            try {
+                const response = await axios.post(API_URL + 'signin', {
+                    username: user.username,
+                    password: user.password,
+                })
 
-            if (response.data.accessToken) {
-                localStorage.setItem('user', JSON.stringify(response.data))
+                if (response.data.accessToken) {
+                    this.loading = false
+                    localStorage.setItem('user', JSON.stringify(response.data))
+                    if (response.data.role == 'ADMIN') {
+                        this.$router.go(0)
+                        this.$router.push('/admin')
+                    } else {
+                        this.$router.go(0)
+                        this.$router.push('/user')
+                    }
+                }
+            } catch (e) {
+                this.message = 'Bad credential'
+                this.loading = false
             }
         },
     },

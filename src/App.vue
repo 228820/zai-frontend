@@ -39,12 +39,6 @@
             </div>
 
             <div v-if="currentUser" class="navbar-nav ml-auto">
-                <!-- <li class="nav-item">
-                    <router-link to="/user" class="nav-link">
-                        <font-awesome-icon icon="user" />
-                        {{ currentUser.username }}
-                    </router-link>
-                </li> -->
                 <li class="nav-item">
                     <a class="nav-link" @click.prevent="logOut">
                         <font-awesome-icon icon="sign-out-alt" /> LogOut
@@ -64,7 +58,7 @@ export default {
     computed: {
         currentUser() {
             const user = JSON.parse(localStorage.getItem('user'))
-            return user
+            return user?.id
         },
         isUserAdmin() {
             if (this.currentUser && this.currentUser['roles']) {
@@ -82,6 +76,7 @@ export default {
     methods: {
         logOut() {
             localStorage.removeItem('user')
+            this.$router.go(0)
             this.$router.push('/login')
         },
     },

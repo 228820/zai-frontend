@@ -17,7 +17,7 @@ export default {
         }
     },
     async mounted() {
-        const API_URL = 'http://localhost:8080/api/messages'
+        const API_URL = 'http://localhost:8080/api/messages/'
         const user = JSON.parse(localStorage.getItem('user'))
         const response = await axios.get(API_URL + 'user', {
             headers: { Authorization: 'Bearer ' + user.accessToken },

@@ -99,7 +99,7 @@ export default {
     computed: {
         loggedIn() {
             const user = JSON.parse(localStorage.getItem('user'))
-            return user
+            return !!user?.id
         },
     },
     mounted() {
@@ -121,18 +121,23 @@ export default {
             this.successful = false
             this.loading = true
 
-            const response = await axios.post(API_URL + 'signup', {
-                username: user.username,
-                email: user.email,
-                password: user.password,
-            })
-
-            if (response.data.statusCode == 200) {
-                this.message = response.data.message
-                this.successful = true
-                this.loading = false
-            } else {
-                this.message = response.data
+            let response
+            try {
+                response = await axios.post(API_URL + 'signup', {
+                    username: user.username,
+                    email: user.email,
+                    password: user.password,
+                })
+                console.log(response)
+                if (response.status == 200) {
+                    this.$router.push('/login')
+                } else {
+                    this.message = response.data.message.Message
+                    this.successful = false
+                    this.loading = false
+                }
+            } catch (e) {
+                this.message = e?.response?.data?.Error
                 this.successful = false
                 this.loading = false
             }
