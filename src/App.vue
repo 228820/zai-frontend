@@ -8,7 +8,7 @@
                         <font-awesome-icon icon="home" /> Home
                     </router-link>
                 </li>
-                <li class="nav-item">
+                <li v-if="currentUser" class="nav-item">
                     <router-link to="/users" class="nav-link"
                         >Users</router-link
                     >
@@ -58,7 +58,7 @@ export default {
     computed: {
         currentUser() {
             const user = JSON.parse(localStorage.getItem('user'))
-            return user?.id
+            return !!user?.id
         },
         isUserAdmin() {
             if (this.currentUser) {

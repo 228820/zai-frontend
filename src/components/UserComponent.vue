@@ -22,7 +22,7 @@ export default {
         const response = await axios.get(API_URL + 'user', {
             headers: { Authorization: 'Bearer ' + user.accessToken },
         })
-        this.content = response.data
+        this.content = response.data.message
     },
 }
 </script>
