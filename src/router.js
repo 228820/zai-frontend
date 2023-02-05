@@ -5,6 +5,7 @@ import RegisterComponent from './components/RegisterComponent.vue'
 import UserComponent from './components/UserComponent.vue'
 import AdminComponent from './components/AdminComponent.vue'
 import UsersListComponent from './components/UsersListComponent.vue'
+import UserEditComponent from './components/UserEditComponent.vue'
 
 const routes = [
     {
@@ -35,6 +36,11 @@ const routes = [
     {
         path: '/users',
         component: UsersListComponent,
+    },
+    {
+        path: '/editUser/:id',
+        name: 'editUser',
+        component: UserEditComponent,
     },
 ]
 
