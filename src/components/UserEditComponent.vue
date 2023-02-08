@@ -6,7 +6,10 @@
                 src="//ssl.gstatic.com/accounts/ui/avatar_2x.png"
                 class="profile-img-card"
             />
-            <Form @submit="handleUserEdit" :validation-schema="schema">
+            <Form
+                @submit="handleUserEdit"
+                :validation-schema="isUser ? schemaForUser : schemaForAdmin"
+            >
                 <div v-if="!successful">
                     <div class="form-group">
                         <label for="username">Username</label>
@@ -28,7 +31,7 @@
                         />
                         <ErrorMessage name="email" class="error-feedback" />
                     </div>
-                    <div class="form-group">
+                    <div v-if="isUser" class="form-group">
                         <label for="password">Password</label>
                         <Field
                             name="password"
@@ -62,6 +65,12 @@
                             ></span>
                             Edit User
                         </button>
+                        <button
+                            class="btn btn-outline-primary btn-block"
+                            @click="cancelEdit"
+                        >
+                            Cancel
+                        </button>
                     </div>
                 </div>
             </Form>
@@ -90,7 +99,7 @@ export default {
         ErrorMessage,
     },
     data() {
-        const schema = yup.object().shape({
+        const schemaForUser = yup.object().shape({
             username: yup
                 .string()
                 .required('Username is required!')
@@ -108,17 +117,31 @@ export default {
                 .max(80, 'Must be maximum 40 characters!'),
         })
 
+        const schemaForAdmin = yup.object().shape({
+            username: yup
+                .string()
+                .required('Username is required!')
+                .min(3, 'Must be at least 3 characters!')
+                .max(20, 'Must be maximum 20 characters!'),
+            email: yup
+                .string()
+                .required('Email is required!')
+                .email('Email is invalid!')
+                .max(20, 'Must be maximum 50 characters!'),
+        })
+
         return {
             API_URL: 'http://localhost:8080/api/users/',
             successful: false,
             loading: false,
             message: '',
-            schema,
+            schemaForUser,
+            schemaForAdmin,
             user: {
                 username: '',
                 email: '',
                 password: '',
-                role: '',
+                role: 'user',
             },
         }
     },
@@ -157,47 +180,56 @@ export default {
         this.user.role = response.data.roles[0].role
     },
     methods: {
+        delay(time) {
+            return new Promise((resolve) => setTimeout(resolve, time))
+        },
         async handleUserEdit() {
             this.message = ''
             this.successful = false
             this.loading = true
 
-            console.log(this.user)
-
             const user = JSON.parse(localStorage.getItem('user'))
-
-            try {
-                const response = await axios.put(
-                    this.API_URL + `${this.$route.params.id}`,
-                    {
-                        headers: {
-                            Authorization: 'Bearer ' + user.accessToken,
+            if (user) {
+                try {
+                    await axios.put(
+                        this.API_URL + `${this.$route.params.id}`,
+                        {
+                            username: this.user.username,
+                            email: this.user.email,
+                            password: this.user.password,
+                            role: [this.user.role.toLowerCase()],
                         },
-                        // body: {
-                        //     username: this.user.username,
-                        //     email: this.user.email,
-                        //     password: this.user.password,
-                        //     role: [this.user.role],
-                        // },
+                        {
+                            headers: {
+                                Authorization: 'Bearer ' + user.accessToken,
+                            },
+                        }
+                    )
+
+                    this.message = 'User edit successfully'
+                    this.successful = true
+                    this.loading = false
+                    await this.delay(2000)
+                    this.$router.go(-1)
+                } catch (e) {
+                    if (e.response.status == 403 || e.response.status == 401) {
+                        this.message =
+                            "You don't have perrmission to access this resource"
+                    } else {
+                        this.message =
+                            'Something went wrong, please try again later'
                     }
-                )
-
-                console.log(response)
-
-                this.successful = true
-                this.loading = false
-            } catch (e) {
-                localStorage.removeItem('user')
-                if (e.response.status == 403) {
-                    this.message =
-                        "You don't have perrmission to access this resource"
-                } else {
-                    this.message =
-                        'Something went wrong, please try again later'
+                    this.successful = false
+                    this.loading = false
                 }
+            } else {
+                this.message = 'Something went wrong, please try again later'
                 this.successful = false
                 this.loading = false
             }
+        },
+        cancelEdit() {
+            this.$router.go(-1)
         },
     },
 }
