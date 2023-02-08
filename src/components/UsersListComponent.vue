@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <header class="jumbotron">
-            <h1>Here will be users list</h1>
+            <h1>Users list</h1>
             <h3 v-if="content.length != 0">{{ content }}</h3>
         </header>
         <nav v-if="isUserAdmin" aria-label="Page navigation example">
@@ -78,7 +78,7 @@ export default {
             }
         },
         async nextPage() {
-            if (this.page < this.pageCount-1) {
+            if (this.page < this.pageCount - 1) {
                 this.page++
                 this.users = []
                 const user = JSON.parse(localStorage.getItem('user'))
@@ -113,6 +113,8 @@ export default {
             } else if (this.isUser) {
                 await this.getDataForUser(user)
             } else {
+                localStorage.removeItem('user')
+                this.$router.go(0)
                 this.content =
                     "You don't have perrmission to access this resource"
             }

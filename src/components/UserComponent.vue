@@ -25,6 +25,8 @@ export default {
             })
             this.content = response.data.message
         } catch (e) {
+            localStorage.removeItem('user')
+            this.$router.go(0)
             if (e.response.status == 403) {
                 this.content =
                     "You don't have perrmission to access this resource"

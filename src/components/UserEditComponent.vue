@@ -39,7 +39,7 @@
                         <ErrorMessage name="password" class="error-feedback" />
                     </div>
 
-                    <div class="form-group">
+                    <div v-if="isUserAdmin" class="form-group">
                         <label for="roleSelect">Role</label>
                         <select class="form-control" v-model="user.role">
                             <option :selected="isUser" value="USER">
@@ -122,20 +122,11 @@ export default {
             },
         }
     },
-    async mounted() {
-        const user = JSON.parse(localStorage.getItem('user'))
-        const response = await axios.get(
-            this.API_URL + `${this.$route.params.id}`,
-            {
-                headers: { Authorization: 'Bearer ' + user.accessToken },
-            }
-        )
-
-        this.user.username = response.data.username
-        this.user.email = response.data.email
-        this.user.role = response.data.roles[0].role
-    },
-    methods: {
+    computed: {
+        currentUser() {
+            const user = JSON.parse(localStorage.getItem('user'))
+            return !!user?.id
+        },
         isUserAdmin() {
             if (this.currentUser) {
                 return JSON.parse(localStorage.getItem('user')).role == 'ADMIN'
@@ -151,6 +142,21 @@ export default {
             }
             return false
         },
+    },
+    async mounted() {
+        const user = JSON.parse(localStorage.getItem('user'))
+        const response = await axios.get(
+            this.API_URL + `${this.$route.params.id}`,
+            {
+                headers: { Authorization: 'Bearer ' + user.accessToken },
+            }
+        )
+
+        this.user.username = response.data.username
+        this.user.email = response.data.email
+        this.user.role = response.data.roles[0].role
+    },
+    methods: {
         async handleUserEdit() {
             this.message = ''
             this.successful = false
@@ -181,6 +187,7 @@ export default {
                 this.successful = true
                 this.loading = false
             } catch (e) {
+                localStorage.removeItem('user')
                 if (e.response.status == 403) {
                     this.message =
                         "You don't have perrmission to access this resource"

@@ -36,7 +36,11 @@
                 </div>
 
                 <div class="form-group">
-                    <div v-if="message" class="alert alert-danger" role="alert">
+                    <div
+                        v-if="message"
+                        class="alert"
+                        :class="successful ? 'alert-success' : 'alert-danger'"
+                    >
                         {{ message }}
                     </div>
                 </div>
@@ -65,6 +69,7 @@ export default {
 
         return {
             loading: false,
+            successful: false,
             message: '',
             schema,
         }
@@ -85,9 +90,13 @@ export default {
         }
     },
     methods: {
+        delay(time) {
+            return new Promise((resolve) => setTimeout(resolve, time))
+        },
         async handleLogin(user) {
             const API_URL = 'http://localhost:8080/api/auth/'
             this.loading = true
+            this.successful = false
 
             try {
                 const response = await axios.post(API_URL + 'signin', {
@@ -97,12 +106,16 @@ export default {
 
                 if (response.data.accessToken) {
                     this.loading = false
+                    this.successful = true
+                    this.message = 'Sign in successfully'
+                    await this.delay(1000)
+
                     localStorage.setItem('user', JSON.stringify(response.data))
-                    console.log(response)
-                    if (response.data.role == 'ADMIN') {
+
+                    if (response.data.role === 'ADMIN') {
                         this.$router.push('/adminMessage')
                         this.$router.go(-1)
-                    } else {
+                    } else if (response.data.role === 'USER') {
                         this.$router.push('/userMessage')
                         this.$router.go(-1)
                     }

@@ -112,6 +112,9 @@ export default {
         }
     },
     methods: {
+        delay(time) {
+            return new Promise((resolve) => setTimeout(resolve, time))
+        },
         async handleRegister(user) {
             const API_URL = 'http://localhost:8080/api/auth/'
             this.message = ''
@@ -125,8 +128,11 @@ export default {
                     email: user.email,
                     password: user.password,
                 })
-                console.log(response)
                 if (response.status == 200) {
+                    this.message = 'Register successfully'
+                    this.successful = true
+                    this.loading = false
+                    await this.delay(1000)
                     this.$router.push('/login')
                 } else {
                     this.message = response.data.message.Message

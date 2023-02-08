@@ -55,6 +55,11 @@
 
 <script>
 export default {
+    data() {
+        return {
+            isLoggedIn: JSON.parse(localStorage.getItem('user')) || false,
+        }
+    },
     computed: {
         currentUser() {
             const user = JSON.parse(localStorage.getItem('user'))
@@ -79,9 +84,15 @@ export default {
     methods: {
         logOut() {
             localStorage.removeItem('user')
-            this.$router.go(0)
+            this.$router.go()
             this.$router.push('/login')
         },
     },
 }
 </script>
+
+<style scoped>
+.nav-link {
+    cursor: pointer;
+}
+</style>
